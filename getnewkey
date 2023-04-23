@@ -1,0 +1,127 @@
+
+function getNewKey(t) {
+  void 0 === t && (t = "");
+  var e = t + "appsapi2",
+    n = "",
+    r = t.substr(t.length - 1, 1) || "";
+  switch (true) {
+    case /[a-z]/.test(r):
+      n = hex_sha1(e);
+      break;
+    case /[A-Z]/.test(r):
+      n = hex_md5(e);
+      break;
+    case /\d/.test(r):
+      n = hex_sha256(e);
+      break;
+    default:
+      n = hex_md5(e);
+  }
+
+  return n;
+}
+
+function hex_md5(t) {
+  return hex_md5_raw(unescape(encodeURIComponent(t)));
+}
+
+function hex_md5_raw(t) {
+  return rstr2hex(raw_md5(str2rstr_utf8(t)));
+}
+
+function raw_md5(t) {
+  return rstr_md5(str2rstr_utf8(t));
+}
+
+function hex_sha1(t) {
+  return hex_sha1_raw(unescape(encodeURIComponent(t)));
+}
+
+function hex_sha1_raw(t) {
+  return rstr2hex(raw_sha1(str2rstr_utf8(t)));
+}
+
+function raw_sha1(t) {
+  return rstr_sha1(str2rstr_utf8(t));
+}
+
+function hex_sha256(t) {
+  return hex_sha256_raw(unescape(encodeURIComponent(t)));
+}
+
+function hex_sha256_raw(t) {
+  return rstr2hex(raw_sha256(str2rstr_utf8(t)));
+}
+
+function raw_sha256(t) {
+  return rstr_sha256(str2rstr_utf8(t));
+}
+
+function rstr_sha256(t) {
+  return binb2rstr(binb_sha256(rstr2binb(t), 8 * t.length));
+}
+
+function binb_sha256(t, e) {
+  t[e >> 5] |= 128 << 24 - e % 32, t[(e + 64 >> 9 << 4) + 15] = e;
+  for (
+    var n = Array(64),
+      r = 1732584193,
+      o = -271733879,
+      i = -1732584194,
+      a = 271733878,
+      s = -1009589776,
+      c = 0;
+    c < t.length;
+    c += 16
+  ) {
+    var u = r,
+      l = o,
+      f = i,
+      h = a,
+      d = s;
+    for (g = 0; g < 64; g++) {
+      var p = g < 16 ? t[c + g] : (n[g - 3] ^ n[g - 8] ^ n[g - 14] ^ n[g - 16]) >>> 0,
+        y =
+          ((a << 5) | (a >>> 27)) +
+          ((a & i) ^ (~a & s)) +
+          d +
+          (p >>> 0) +
+          e[g] >>> 0;
+      (s = i),
+        (i = o),
+        (o = (r << 30) | (r >>> 2)),
+        (r = u),
+        (d = y);
+    }
+    (r += u), (o += l), (i += f), (a += h), (s += d);
+  }
+  return Array(r, o, i, a, s);
+}
+function rstr2binb(t) {
+  for (var e = Array(t.length >> 2), n = 0; n < e.length; n++) e[n] = 0;
+  for (n = 0; n < 8 * t.length; n += 8)
+    e[n >> 5] |= (255 & t.charCodeAt(n / 8)) << 24 - n % 32;
+  return e;
+}
+
+function binb2rstr(t) {
+  for (var e = "", n = 0; n < 32 * t.length; n += 8)
+    e += String.fromCharCode((t[n >> 5] >>> 24 - n % 32) & 255);
+  return e;
+}
+
+function rstr2hex(t) {
+  for (var e = "", n = 0; n < t.length; n++)
+    e +=
+      (16 > t.charCodeAt(n) ? "0" : "") +
+      t.charCodeAt(n).toString(16);
+  return e;
+}
+
+function str2rstr_utf8(t) {
+  return unescape(encodeURIComponent(t));
+}
+
+function utf8t2str_rstr(t) {
+  return decodeURIComponent(escape(t));
+}
